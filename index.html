@@ -1,0 +1,1417 @@
+1111<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📊 ৯/২১ EMA ক্রস + Overextended (১মি, ৫মি, ১৫মি)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0e11;
+            color: #eaecef;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 12px;
+        }
+        h1 {
+            text-align: center;
+            color: #f0b90b;
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+        }
+        .sub {
+            text-align: center;
+            color: #848e9c;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+        }
+
+        /* ===== Overextended Box ===== */
+        .overextended-box {
+            background: #1a1a2e;
+            border: 2px solid #f0b90b;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 8px 0 12px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .overextended-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(240, 185, 11, 0.04), transparent 60%);
+            pointer-events: none;
+        }
+        .oe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .oe-header h3 {
+            color: #f0b90b;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .oe-header .oe-badge {
+            background: #f0b90b;
+            color: #0b0e11;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .oe-header .oe-sub {
+            color: #848e9c;
+            font-size: 0.65rem;
+        }
+
+        /* Extremes cards */
+        .oe-extremes {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .oe-extreme-card {
+            flex: 1 1 200px;
+            background: #11161d;
+            border-radius: 8px;
+            padding: 10px 14px;
+            border-left: 4px solid #f0b90b;
+        }
+        .oe-extreme-card.above {
+            border-left-color: #f6465d;
+        }
+        .oe-extreme-card.below {
+            border-left-color: #0ecb81;
+        }
+        .oe-extreme-card .label {
+            font-size: 0.65rem;
+            color: #848e9c;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .oe-extreme-card .sym {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f0b90b;
+        }
+        .oe-extreme-card .dist {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        .oe-extreme-card .dist.above {
+            color: #f6465d;
+        }
+        .oe-extreme-card .dist.below {
+            color: #0ecb81;
+        }
+        .oe-extreme-card .meta {
+            font-size: 0.65rem;
+            color: #b7bdc6;
+            margin-top: 4px;
+        }
+        .oe-extreme-card .meta .tf {
+            background: #2b3139;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            color: #f0b90b;
+        }
+
+        .oe-table-wrap {
+            overflow-x: auto;
+        }
+        .oe-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+        .oe-table th {
+            background: #11161d;
+            color: #848e9c;
+            font-weight: 600;
+            padding: 6px 8px;
+            text-align: left;
+            border-bottom: 2px solid #2b3139;
+            white-space: nowrap;
+        }
+        .oe-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #1e2329;
+            white-space: nowrap;
+        }
+        .oe-table tr:hover td {
+            background: #1a1f28;
+        }
+        .oe-sym {
+            font-weight: 700;
+            color: #f0b90b;
+        }
+        .oe-price {
+            font-weight: 600;
+        }
+        .oe-ema-val {
+            color: #b7bdc6;
+            font-size: 0.7rem;
+        }
+        .oe-dist {
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+        .oe-dist.above {
+            color: #f6465d;
+            background: #2a1515;
+        }
+        .oe-dist.below {
+            color: #0ecb81;
+            background: #0d2215;
+        }
+        .oe-label {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .oe-label.above {
+            background: #3d1a1a;
+            color: #f6465d;
+        }
+        .oe-label.below {
+            background: #0d2a1a;
+            color: #0ecb81;
+        }
+        .oe-tf {
+            background: #2b3139;
+            color: #f0b90b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 700;
+        }
+        .oe-footer {
+            font-size: 0.65rem;
+            color: #5e6673;
+            margin-top: 8px;
+        }
+        .oe-footer .hl {
+            color: #f0b90b;
+        }
+        .oe-empty {
+            color: #5e6673;
+            font-size: 0.8rem;
+            padding: 12px 0;
+            text-align: center;
+        }
+
+        /* ===== Cross Alert Box ===== */
+        .cross-box {
+            background: #1a1a2e;
+            border: 2px solid #f0b90b;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 8px 0 12px 0;
+        }
+        .cross-box h3 {
+            color: #f0b90b;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+        .cross-box h3 span {
+            font-size: 0.65rem;
+            color: #848e9c;
+            font-weight: 400;
+        }
+        .cross-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 2px 0;
+        }
+        .cross-item {
+            background: #1e2329;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-left: 4px solid #f0b90b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: fadeIn 0.4s;
+            flex-wrap: wrap;
+        }
+        .cross-item.bull {
+            border-left-color: #0ecb81;
+        }
+        .cross-item.bear {
+            border-left-color: #f6465d;
+        }
+        .cross-item .ctf {
+            font-weight: 400;
+            font-size: 0.55rem;
+            color: #f0b90b;
+            background: #2b3139;
+            padding: 0 6px;
+            border-radius: 4px;
+        }
+        .cross-item .ctime {
+            font-weight: 400;
+            font-size: 0.55rem;
+            color: #848e9c;
+        }
+        .cross-item .cchange {
+            font-size: 0.6rem;
+        }
+        .no-cross {
+            color: #5e6673;
+            font-size: 0.8rem;
+            padding: 4px 0;
+        }
+
+        /* ===== Alert bar ===== */
+        .alert-bar {
+            background: #1e2329;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border-left: 5px solid #f0b90b;
+            margin: 6px auto 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .alert-bar .label {
+            font-weight: 600;
+            color: #b7bdc6;
+            font-size: 0.8rem;
+        }
+        .alert-bar .signal {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .alert-bar.pump {
+            border-left-color: #0ecb81;
+        }
+        .alert-bar.dump {
+            border-left-color: #f6465d;
+        }
+
+        /* ===== Controls ===== */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin: 8px 0;
+        }
+        .controls input,
+        .controls button {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #1e2329;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .controls input {
+            background: #2b3139;
+            width: 140px;
+        }
+        .controls button {
+            background: #f0b90b;
+            color: #0b0e11;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background: #d9a80a;
+        }
+        .controls button.snd-off {
+            background: #4a4a5a;
+            color: #b7bdc6;
+        }
+        .controls button.snd-off:hover {
+            background: #5a5a6a;
+        }
+        .controls button.sec {
+            background: #2b3139;
+            color: #eaecef;
+        }
+        .controls button.sec:hover {
+            background: #3b4149;
+        }
+
+        /* ===== Status ===== */
+        .status-bar {
+            background: #1e2329;
+            padding: 4px 12px;
+            border-radius: 6px;
+            text-align: center;
+            margin: 4px 0 10px;
+            color: #b7bdc6;
+            font-size: 0.7rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px 14px;
+        }
+        .status-bar .stat {
+            color: #f0b90b;
+            font-weight: 600;
+        }
+
+        /* ===== Top Section ===== */
+        .top-section {
+            background: #11161d;
+            border: 2px solid #f0b90b;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin: 10px 0;
+        }
+        .top-section h2 {
+            color: #f0b90b;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .top-section h2 span {
+            font-size: 0.6rem;
+            color: #848e9c;
+            font-weight: 400;
+        }
+        .top-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 6px;
+        }
+        .top-card {
+            background: #1a1f28;
+            border-radius: 8px;
+            padding: 8px 10px;
+            border-left: 4px solid #f0b90b;
+            transition: 0.15s;
+        }
+        .top-card:hover {
+            transform: scale(1.01);
+        }
+        .top-card.pump {
+            border-left-color: #0ecb81;
+        }
+        .top-card.dump {
+            border-left-color: #f6465d;
+        }
+        .top-card .sym {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #f0b90b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .top-card .sym .sc {
+            background: #2b3139;
+            padding: 0 8px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #f0b90b;
+        }
+        .top-card .price {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .top-card .sig-text {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .top-card .sig-text.pump {
+            color: #0ecb81;
+        }
+        .top-card .sig-text.dump {
+            color: #f6465d;
+        }
+        .top-card .sig-text.neutral {
+            color: #848e9c;
+        }
+        .top-card .mini-ind {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px 6px;
+            font-size: 0.55rem;
+            color: #848e9c;
+            margin-top: 2px;
+        }
+        .top-card .mini-ind strong {
+            color: #eaecef;
+        }
+
+        /* ===== Grid ===== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .card {
+            background: #181a20;
+            border-radius: 8px;
+            padding: 8px 10px;
+            border: 1px solid #2b3139;
+            transition: 0.15s;
+        }
+        .card:hover {
+            border-color: #f0b90b;
+        }
+        .card .sym {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f0b90b;
+            display: flex;
+            justify-content: space-between;
+        }
+        .card .price {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .card .change {
+            font-size: 0.65rem;
+        }
+        .card .sig-tag {
+            font-size: 0.6rem;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: #1e2329;
+            border-left: 3px solid #848e9c;
+            margin: 2px 0;
+        }
+        .card .sig-tag.pump {
+            border-left-color: #0ecb81;
+        }
+        .card .sig-tag.dump {
+            border-left-color: #f6465d;
+        }
+        .card .indics {
+            font-size: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1px 5px;
+            background: #0b0e11;
+            padding: 3px 5px;
+            border-radius: 4px;
+            margin-top: 2px;
+            color: #848e9c;
+        }
+        .card .indics strong {
+            color: #eaecef;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 12px;
+            color: #5e6673;
+            font-size: 0.6rem;
+        }
+        .loading {
+            text-align: center;
+            padding: 16px;
+            color: #848e9c;
+            font-size: 0.8rem;
+        }
+        .badge {
+            background: #2b3139;
+            padding: 0 6px;
+            border-radius: 12px;
+            font-size: 0.5rem;
+        }
+
+        /* scrollbar */
+        .cross-grid::-webkit-scrollbar,
+        .oe-table-wrap::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .cross-grid::-webkit-scrollbar-thumb,
+        .oe-table-wrap::-webkit-scrollbar-thumb {
+            background: #f0b90b;
+            border-radius: 4px;
+        }
+        .cross-grid::-webkit-scrollbar-track,
+        .oe-table-wrap::-webkit-scrollbar-track {
+            background: #1e2329;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .oe-table {
+                font-size: 0.65rem;
+            }
+            .oe-table th,
+            .oe-table td {
+                padding: 4px 5px;
+            }
+            .top-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .controls input {
+                width: 100px;
+            }
+            .cross-item {
+                font-size: 0.65rem;
+                padding: 3px 8px;
+            }
+            .oe-extremes {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        @media (max-width: 400px) {
+            .top-grid {
+                grid-template-columns: 1fr;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📊 ৯/২১ EMA ক্রস + Overextended</h1>
+    <p class="sub">⏱ ১মি · ৫মি · ১৫মি  —  EMA-৯ থেকে দূরত্ব &amp; ক্রস এলার্ট (শুধু ১মি ও ৫মি)</p>
+
+    <!-- ============================================================ -->
+    <!-- ✅ OVEREXTENDED BOX                                           -->
+    <!-- ============================================================ -->
+    <div class="overextended-box" id="oeBox">
+        <div class="oe-header">
+            <h3>
+                📏 Overextended (EMA ৯ থেকে দূরত্ব)
+                <span class="oe-badge">1m · 5m · 15m</span>
+            </h3>
+            <span class="oe-sub">⚡ যত দূরে, রিভার্সাল তত বেশি</span>
+        </div>
+
+        <!-- 2 Extreme Cards Upper/Lower -->
+        <div class="oe-extremes" id="oeExtremes">
+            <!-- Filled dynamically -->
+        </div>
+
+        <div class="oe-table-wrap">
+            <table class="oe-table" id="oeTable">
+                <thead>
+                    <tr>
+                        <th>টাইমফ্রেম</th>
+                        <th>কয়েন</th>
+                        <th>প্রাইস</th>
+                        <th>EMA ৯</th>
+                        <th>দূরত্ব %</th>
+                        <th>স্ট্যাটাস</th>
+                        <th>২৪h %</th>
+                    </tr>
+                </thead>
+                <tbody id="oeBody">
+                    <tr><td colspan="7" class="oe-empty">⏳ ডেটা লোড হচ্ছে...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="oe-footer">
+            💡 <span class="hl">নিয়ম:</span> প্রাইস রবার-ব্যান্ডের মতো — EMA ৯ থেকে বেশি দূরে গেলে দ্রুত ফিরে আসার প্রবণতা থাকে
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ✅ EMA CROSS ALERT BOX – only 1m & 5m                        -->
+    <!-- ============================================================ -->
+    <div class="cross-box" id="crossBox">
+        <h3>
+            🔔 লাইভ EMA (৯/২১) ক্রস এলার্ট
+            <span>⏱ শুধু ১মি ও ৫মি — যেকোনো ক্রস দেখাবে</span>
+        </h3>
+        <div class="cross-grid" id="crossContainer">
+            <span class="no-cross">⏳ মনিটরিং...</span>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- Alert bar                                                     -->
+    <!-- ============================================================ -->
+    <div class="alert-bar" id="alertBar">
+        <span class="label">📡 সর্বশেষ সিগন্যাল:</span>
+        <span class="signal" id="signalText">⏳ মনিটরিং...</span>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- Controls                                                      -->
+    <!-- ============================================================ -->
+    <div class="controls">
+        <input type="text" id="coinInput" placeholder="BTCUSDT" value="BTCUSDT" />
+        <button id="addBtn">➕ যোগ</button>
+        <button id="scanBtn" class="sec">🔄 স্ক্যান</button>
+        <button id="soundToggle">🔊 অন</button>
+        <button id="loadTopBtn" class="sec">📊 টপ ৫০</button>
+        <button id="testVoiceBtn" style="background:#2b3139;color:#eaecef;font-size:10px;">🔊 টেস্ট</button>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- Status bar                                                    -->
+    <!-- ============================================================ -->
+    <div class="status-bar">
+        <span>মোট: <span class="stat" id="totalCoins">০</span></span>
+        <span>স্ক্যান: <span class="stat" id="scanStatus">অপেক্ষা...</span></span>
+        <span>⏱ <span class="stat" id="lastUpdateTime">--</span></span>
+        <span>OE: <span class="stat" id="oeStatus">—</span></span>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- Top 10 signals                                                -->
+    <!-- ============================================================ -->
+    <div class="top-section">
+        <h2>🏆 টপ ১০ সিগন্যাল <span>স্কোর অনুযায়ী</span></h2>
+        <div class="top-grid" id="topContainer"><div class="loading">⏳ লোড হচ্ছে...</div></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- All coins grid                                                -->
+    <!-- ============================================================ -->
+    <div id="cardContainer" class="grid"><div class="loading">⏳ লোড হচ্ছে...</div></div>
+
+    <div class="footer">⚡ Binance Futures · প্রতি ১০ সেকেন্ডে আপডেট · ১মি/৫মি/১৫মি</div>
+
+    <script>
+        // ======================================================================
+        // কনফিগারেশন
+        // ======================================================================
+        const FUTURES_BASE = 'https://fapi.binance.com';
+        const BATCH_SIZE = 8;
+        const BATCH_DELAY = 800;
+        const UPDATE_INTERVAL = 10000;
+        const TIMEFRAMES = ['1m', '5m', '15m'];
+        const SIGNAL_THRESHOLD = 20;
+
+        let watchlist = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'DOGEUSDT', 'ADAUSDT'];
+        let coinData = {}; 
+        let soundEnabled = true;
+        let crossHistory = []; 
+        let isScanning = false;
+        let speechSynth = window.speechSynthesis;
+
+        // ======================================================================
+        // DOM Elements
+        // ======================================================================
+        const container = document.getElementById('cardContainer');
+        const topContainer = document.getElementById('topContainer');
+        const crossContainer = document.getElementById('crossContainer');
+        const signalTextEl = document.getElementById('signalText');
+        const totalCoinsEl = document.getElementById('totalCoins');
+        const scanStatusEl = document.getElementById('scanStatus');
+        const lastUpdateTimeEl = document.getElementById('lastUpdateTime');
+        const oeStatusEl = document.getElementById('oeStatus');
+        const oeBody = document.getElementById('oeBody');
+        const oeExtremes = document.getElementById('oeExtremes');
+        const coinInput = document.getElementById('coinInput');
+        const addBtn = document.getElementById('addBtn');
+        const scanBtn = document.getElementById('scanBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        const loadTopBtn = document.getElementById('loadTopBtn');
+        const testVoiceBtn = document.getElementById('testVoiceBtn');
+        const alertBar = document.getElementById('alertBar');
+
+        // Dynamic Formatting Utility
+        function formatPrice(p) {
+            if (p === 0) return '0.00';
+            if (p >= 100) return p.toFixed(2);
+            if (p >= 1) return p.toFixed(4);
+            return p.toFixed(6);
+        }
+
+        // ======================================================================
+        // ভয়েস / সাউন্ড
+        // ======================================================================
+        function speakAlert(symbol, signalType, detail = '') {
+            if (!soundEnabled) return;
+            try {
+                if (speechSynth.speaking) speechSynth.cancel();
+                const cn = symbol.replace('USDT', '');
+                let msg = '';
+                if (signalType === 'cross_bull') msg = `${cn} ৯/২১ EMA বুলিশ ক্রস! ${detail}`;
+                else if (signalType === 'cross_bear') msg = `${cn} ৯/২১ EMA বেয়ারিশ ক্রস! ${detail}`;
+                else if (signalType === 'pump') msg = `${cn} পাম্প হতে পারে! ${detail}`;
+                else if (signalType === 'dump') msg = `${cn} ডাম্প হতে পারে! ${detail}`;
+                else return;
+                const u = new SpeechSynthesisUtterance(msg);
+                u.lang = 'bn-BD';
+                u.rate = 0.85;
+                u.pitch = 1.1;
+                const voices = speechSynth.getVoices();
+                const bn = voices.find(v => v.lang.startsWith('bn'));
+                if (bn) u.voice = bn;
+                speechSynth.speak(u);
+                playBeep(signalType === 'cross_bull' || signalType === 'pump' ? 1200 : 600, 200);
+            } catch (e) { playBeep(800, 200); }
+        }
+
+        function playBeep(freq, dur) {
+            if (!soundEnabled) return;
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = freq;
+                osc.type = 'sine';
+                gain.gain.value = 0.2;
+                osc.start();
+                setTimeout(() => osc.stop(), dur);
+            } catch (e) {}
+        }
+
+        function showNotif(title, body) {
+            try {
+                if (Notification.permission === 'granted') new Notification(title, { body, icon: '🔔' });
+                else if (Notification.permission === 'default') Notification.requestPermission();
+            } catch (e) {}
+            document.body.style.transition = 'background 0.2s';
+            document.body.style.background = '#2a1f1f';
+            setTimeout(() => document.body.style.background = '#0b0e11', 400);
+        }
+
+        // ======================================================================
+        // টেকনিক্যাল ইন্ডিকেটর গণনার ফাংশন
+        // ======================================================================
+        function calcEMA(data, period) {
+            const ema = [];
+            const k = 2 / (period + 1);
+            let sum = 0;
+            const n = Math.min(period, data.length);
+            for (let i = 0; i < n; i++) sum += data[i];
+            let prev = sum / n;
+            ema.push(prev);
+            for (let i = 1; i < data.length; i++) {
+                const cur = (data[i] - prev) * k + prev;
+                ema.push(cur);
+                prev = cur;
+            }
+            return ema;
+        }
+
+        function calcRSI(data, period = 14) {
+            const rsi = [];
+            let gain = 0, loss = 0;
+            const n = Math.min(period + 1, data.length);
+            for (let i = 1; i < n; i++) {
+                const d = data[i] - data[i - 1];
+                if (d > 0) gain += d;
+                else loss += Math.abs(d);
+            }
+            let avgG = gain / period, avgL = loss / period || 0.001;
+            rsi.push(100 - (100 / (1 + avgG / avgL)));
+            for (let i = period + 1; i < data.length; i++) {
+                const d = data[i] - data[i - 1];
+                avgG = ((avgG * (period - 1)) + (d > 0 ? d : 0)) / period;
+                avgL = ((avgL * (period - 1)) + (d < 0 ? Math.abs(d) : 0)) / period || 0.001;
+                rsi.push(100 - (100 / (1 + avgG / avgL)));
+            }
+            return rsi;
+        }
+
+        function calcSuperTrend(high, low, close, period = 10, mult = 3) {
+            const atr = [];
+            const upper = [], lower = [], trend = [];
+            let sum = 0;
+            for (let i = 0; i < high.length; i++) {
+                if (i < period) {
+                    if (i === 0) { atr.push(0); continue; }
+                    const tr = Math.max(high[i] - low[i], Math.abs(high[i] - close[i - 1]), Math.abs(low[i] - close[i - 1]));
+                    sum += tr;
+                    atr.push(i === period - 1 ? sum / period : 0);
+                } else {
+                    const tr = Math.max(high[i] - low[i], Math.abs(high[i] - close[i - 1]), Math.abs(low[i] - close[i - 1]));
+                    const prev = atr[i - 1] || 0;
+                    atr.push((prev * (period - 1) + tr) / period);
+                }
+            }
+            for (let i = 0; i < high.length; i++) {
+                const hl2 = (high[i] + low[i]) / 2;
+                const a = atr[i] || 0;
+                let u = hl2 + mult * a, l = hl2 - mult * a;
+                upper.push(u);
+                lower.push(l);
+                if (i === 0) { trend.push(1); continue; }
+                const pt = trend[i - 1];
+                let ct = pt;
+                if (pt === 1 && close[i] < lower[i - 1]) ct = -1;
+                if (pt === -1 && close[i] > upper[i - 1]) ct = 1;
+                if (ct === 1 && u < upper[i - 1]) upper[i] = upper[i - 1];
+                if (ct === -1 && l > lower[i - 1]) lower[i] = lower[i - 1];
+                trend.push(ct);
+            }
+            return { trend };
+        }
+
+        // ======================================================================
+        // API সংযোগ
+        // ======================================================================
+        async function fetchData(symbol, timeframe = '5m', limit = 100) {
+            try {
+                const tickerRes = await fetch(`${FUTURES_BASE}/fapi/v1/ticker/24hr?symbol=${symbol}`);
+                const ticker = await tickerRes.json();
+                if (ticker.code) return null;
+                const klinesRes = await fetch(`${FUTURES_BASE}/fapi/v1/klines?symbol=${symbol}&interval=${timeframe}&limit=${limit}`);
+                const klines = await klinesRes.json();
+                if (!klines || !klines.length) return null;
+                return { ticker, klines };
+            } catch (e) { return null; }
+        }
+
+        // ======================================================================
+        // টাইমফ্রেম অ্যানালাইসিস
+        // ======================================================================
+        function analyzeTF(data, symbol, tf) {
+            if (!data) return null;
+            const { ticker, klines } = data;
+            if (!ticker || !klines || klines.length < 25) return null;
+
+            const price = parseFloat(ticker.lastPrice);
+            const change = parseFloat(ticker.priceChangePercent) || 0;
+            const vol24h = parseFloat(ticker.quoteVolume) || 0;
+            const closes = klines.map(k => parseFloat(k[4]));
+            const highs = klines.map(k => parseFloat(k[2]));
+            const lows = klines.map(k => parseFloat(k[3]));
+            const vols = klines.map(k => parseFloat(k[5]));
+
+            const ema9 = calcEMA(closes, 9);
+            const ema21 = calcEMA(closes, 21);
+            const lastE9 = ema9[ema9.length - 1] || price;
+            const lastE21 = ema21[ema21.length - 1] || price;
+            const prevE9 = ema9[ema9.length - 2] || lastE9;
+            const prevE21 = ema21[ema21.length - 2] || lastE21;
+
+            const crossUp = (prevE9 <= prevE21 && lastE9 > lastE21);
+            const crossDown = (prevE9 >= prevE21 && lastE9 < lastE21);
+
+            const distPct = ((price - lastE9) / lastE9) * 100;
+            const absDist = Math.abs(distPct);
+
+            const rsi = calcRSI(closes, 14);
+            const lastRsi = rsi[rsi.length - 1] || 50;
+
+            const st = calcSuperTrend(highs, lows, closes, 10, 3);
+            const stTrend = st.trend[st.trend.length - 1] || 1;
+
+            const recentV = vols.slice(-5).reduce((a, b) => a + b, 0) / 5;
+            const prevV = vols.slice(-15, -5).reduce((a, b) => a + b, 0) / 10 || 1;
+            const volSpike = recentV > prevV * 2.8;
+
+            return {
+                symbol, tf, price, change, vol24h,
+                ema9: lastE9, ema21: lastE21,
+                crossUp, crossDown, distPct, absDist,
+                rsi: lastRsi, stBull: stTrend === 1, stBear: stTrend === -1, volSpike,
+                lastUpdate: new Date().toLocaleTimeString('bn-BD')
+            };
+        }
+
+        async function analyzeAll(symbol) {
+            const results = {};
+            const tfData = await Promise.all(
+                TIMEFRAMES.map(async (tf) => {
+                    const d = await fetchData(symbol, tf, 100);
+                    return { tf, data: d };
+                })
+            );
+            for (const { tf, data } of tfData) {
+                if (data) {
+                    const analyzed = analyzeTF(data, symbol, tf);
+                    if (analyzed) results[tf] = analyzed;
+                }
+            }
+            if (results['5m']) {
+                results['common'] = {
+                    change: results['5m'].change, vol24h: results['5m'].vol24h, price: results['5m'].price,
+                    rsi: results['5m'].rsi, stBull: results['5m'].stBull, stBear: SubBear = results['5m'].stBear, volSpike: results['5m'].volSpike
+                };
+            } else if (results['1m']) {
+                results['common'] = {
+                    change: results['1m'].change, vol24h: results['1m'].vol24h, price: results['1m'].price,
+                    rsi: results['1m'].rsi, stBull: results['1m'].stBull, stBear: results['1m'].stBear, volSpike: results['1m'].volSpike
+                };
+            }
+            return results;
+        }
+
+        // ======================================================================
+        // স্কোরিং অ্যালগরিদম (Fixed syntax line breaking)
+        // ======================================================================
+        function computeScore(tfData) {
+            const d = tfData['5m'] || tfData['1m'];
+            if (!d) return { pump: 0, dump: 0, pumpDetails: [], dumpDetails: [], signal: 'neutral', signalText: '⏸ কোন সিগন্যাল নেই', score: 0, detail: '' };
+
+            let pump = 0, dump = 0;
+            const pd = [], dd = [];
+
+            if (d.crossUp) { pump += 22; pd.push('🟢9/21↑'); }
+            if (d.crossDown) { dump += 22; dd.push('🔴9/21↓'); }
+
+            if (d.rsi < 30) { pump += 12; pd.push('RSI↓'); } 
+            else if (d.rsi > 70) { dump += 12; dd.push('RSI↑'); }
+
+            if (d.stBull) { pump += 12; pd.push('Super↑'); }
+            if (d.stBear) { dump += 12; dd.push('Super↓'); }
+
+            if (d.volSpike) { pump += 10; pd.push('VOL🔥'); dump += 10; dd.push('VOL🔥'); }
+
+            if (d.change > 5) { pump += 12; pd.push('🚀+5%'); }
+            if (d.change > 10) { pump += 18; pd.push('🚀+10%'); }
+            if (d.change < -5) { dump += 12; dd.push('📉-5%'); }
+            if (d.change < -10) { dump += 18; dd.push('📉-10%'); }
+
+            if (d.absDist > 2.5) {
+                if (d.distPct > 0) { dump += 8; dd.push('OE+'); } 
+                else { pump += 8; pd.push('OE-'); }
+            }
+
+            let signal = 'neutral', signalText = '⏸ কোন সিগন্যাল নেই', score = 0, detail = '';
+            if (pump >= SIGNAL_THRESHOLD && pump > dump) {
+                signal = 'pump';
+                signalText = '🚀 PUMP';
+                score = Math.min(100, pump);
+                detail = pd.slice(0, 4).join(', ');
+            } else if (dump >= SIGNAL_THRESHOLD && dump > pump) {
+                signal = 'dump';
+                signalText = '📉 DUMP';
+                score = Math.min(100, dump);
+                detail = dd.slice(0, 4).join(', ');
+            }
+
+            return { pump, dump, pumpDetails: pd, dumpDetails: dd, signal, signalText, score, detail };
+        }
+
+        // ======================================================================
+        // ক্রস এলার্ট ট্র্যাকিং – Limited only to 1m & 5m
+        // ======================================================================
+        let lastCrossState = {};
+        function trackCrosses(symbol, tfData) {
+            const alerts = [];
+            for (const tf of TIMEFRAMES) {
+                if (tf !== '1m' && tf !== '5m') continue;
+                const d = tfData[tf];
+                if (!d) continue;
+                const key = `${symbol}_${tf}`;
+                const prev = lastCrossState[key] || null;
+                let curr = null;
+                if (d.crossUp) curr = 'bull';
+                else if (d.crossDown) curr = 'bear';
+
+                if (curr && curr !== prev) {
+                    const alertObj = {
+                        symbol, tf, type: curr, change: d.change, price: d.price,
+                        time: new Date().toLocaleTimeString('bn-BD')
+                    };
+                    alerts.push(alertObj);
+                    crossHistory.push(alertObj); // Maintain global cross log
+                    speakAlert(symbol, `cross_${curr}`, `${tf}, দাম ${d.change.toFixed(2)}%`);
+                    showNotif(`${curr === 'bull' ? '🟢' : '🔴'} ${tf} EMA ক্রস`, `${symbol} - ৯/২১ ${curr === 'bull' ? 'বুলিশ' : 'বেয়ারিশ'} ক্রস!`);
+                }
+                lastCrossState[key] = curr;
+            }
+            return alerts;
+        }
+
+        // ======================================================================
+        // Overextended টেবিল আপডেট + Extremes Cards
+        // ======================================================================
+        function renderOverextended(allData) {
+            const oeMap = {};
+            let allEntries = []; 
+            for (const tf of TIMEFRAMES) {
+                const entries = [];
+                for (const [sym, data] of Object.entries(allData)) {
+                    const d = data[tf];
+                    if (d && d.absDist > 0.1) {
+                        const entry = {
+                            symbol: sym, dist: d.distPct, absDist: d.absDist,
+                            price: d.price, ema9: d.ema9, change: d.change,
+                            direction: d.distPct > 0 ? 'above' : 'below', tf: tf
+                        };
+                        entries.push(entry);
+                        allEntries.push(entry);
+                    }
+                }
+                entries.sort((a, b) => b.absDist - a.absDist);
+                oeMap[tf] = entries.slice(0, 5);
+            }
+
+            // Global Extreme Check across all watchlists
+            const above = allEntries.filter(e => e.dist > 0).sort((a, b) => b.dist - a.dist);
+            const below = allEntries.filter(e => e.dist < 0).sort((a, b) => a.dist - b.dist); 
+            const topAbove = above.length ? above[0] : null;
+            const topBelow = below.length ? below[0] : null;
+
+            let extremesHtml = '';
+            if (topAbove) {
+                extremesHtml += `
+                    <div class="oe-extreme-card above">
+                        <div class="label">🔼 সর্বোচ্চ উপরে (Above)</div>
+                        <div class="sym">${topAbove.symbol}</div>
+                        <div class="dist above">+${topAbove.dist.toFixed(2)}%</div>
+                        <div class="meta">মূল্য: $${formatPrice(topAbove.price)} · EMA9: $${formatPrice(topAbove.ema9)} · <span class="tf">${topAbove.tf}</span></div>
+                    </div>
+                `;
+            } else {
+                extremesHtml += `<div class="oe-extreme-card above" style="border-left-color:#5e6673;"><div class="label">🔼 উপরে কোনো ডেটা নেই</div></div>`;
+            }
+            if (topBelow) {
+                extremesHtml += `
+                    <div class="oe-extreme-card below">
+                        <div class="label">🔽 সর্বোচ্চ নিচে (Below)</div>
+                        <div class="sym">${topBelow.symbol}</div>
+                        <div class="dist below">${topBelow.dist.toFixed(2)}%</div>
+                        <div class="meta">মূল্য: $${formatPrice(topBelow.price)} · EMA9: $${formatPrice(topBelow.ema9)} · <span class="tf">${topBelow.tf}</span></div>
+                    </div>
+                `;
+            } else {
+                extremesHtml += `<div class="oe-extreme-card below" style="border-left-color:#5e6673;"><div class="label">🔽 নিচে কোনো ডেটা নেই</div></div>`;
+            }
+            oeExtremes.innerHTML = extremesHtml;
+
+            // Render Table
+            let html = '';
+            let found = false;
+            for (const tf of TIMEFRAMES) {
+                const entries = oeMap[tf] || [];
+                if (!entries.length) {
+                    html += `<tr><td><span class="oe-tf">${tf}</span></td><td colspan="6" style="color:#5e6673;">কোন ডেটা নেই</td></tr>`;
+                    continue;
+                }
+                found = true;
+                const rowspan = entries.length;
+                for (let i = 0; i < rowspan; i++) {
+                    const e = entries[i];
+                    const cls = e.direction;
+                    const label = cls === 'above' ? '🔼 ওভারবট' : '🔽 ওভারসল্ড';
+                    const distStr = (e.dist > 0 ? '+' : '') + e.dist.toFixed(2);
+                    const changeColor = e.change >= 0 ? '#0ecb81' : '#f6465d';
+                    html += `<tr>
+                        ${i === 0 ? `<td rowspan="${rowspan}"><span class="oe-tf">${tf}</span></td>` : ''}
+                        <td class="oe-sym">${e.symbol}</td>
+                        <td class="oe-price">$${formatPrice(e.price)}</td>
+                        <td class="oe-ema-val">$${formatPrice(e.ema9)}</td>
+                        <td><span class="oe-dist ${cls}">${distStr}%</span></td>
+                        <td><span class="oe-label ${cls}">${label}</span></td>
+                        <td style="color:${changeColor};">${e.change.toFixed(2)}%</td>
+                    </tr>`;
+                }
+            }
+
+            if (!found) {
+                oeBody.innerHTML = `<tr><td colspan="7" class="oe-empty">⚠️ কোনো ওভারএক্সটেন্ডেড ডেটা নেই</td></tr>`;
+            } else {
+                oeBody.innerHTML = html;
+            }
+
+            let best = null;
+            for (const tf of TIMEFRAMES) {
+                const e = oeMap[tf]?.[0];
+                if (e && (!best || e.absDist > best.absDist)) best = { ...e, tf };
+            }
+            if (best) {
+                oeStatusEl.textContent = `${best.symbol} (${best.tf}) ${(best.dist > 0 ? '+' : '') + best.dist.toFixed(2)}%`;
+                oeStatusEl.style.color = best.direction === 'above' ? '#f6465d' : '#0ecb81';
+            } else {
+                oeStatusEl.textContent = '—';
+                oeStatusEl.style.color = '#b7bdc6';
+            }
+        }
+
+        // ======================================================================
+        // ক্রস কন্টেইনার আপডেট (1m & 5m history viewport)
+        // ======================================================================
+        function renderCrosses() {
+            if (!crossHistory.length) {
+                crossContainer.innerHTML = `<span class="no-cross">✅ কোনো নতুন ক্রস নেই</span>`;
+                return;
+            }
+            const recent = crossHistory.slice(-15).reverse();
+            let html = '';
+            for (const a of recent) {
+                const emoji = a.type === 'bull' ? '🟢' : '🔴';
+                const label = a.type === 'bull' ? 'বুলিশ ↑' : 'বেয়ারিশ ↓';
+                const cls = a.type === 'bull' ? 'bull' : 'bear';
+                const color = a.type === 'bull' ? '#0ecb81' : '#f6465d';
+                const chg = a.change >= 0 ? `+${a.change.toFixed(2)}%` : `${a.change.toFixed(2)}%`;
+                html += `
+                    <div class="cross-item ${cls}">
+                        <span>${emoji} ${a.symbol}</span>
+                        <span style="color:${color};font-weight:700;">${label}</span>
+                        <span class="ctf">${a.tf}</span>
+                        <span class="cchange" style="color:${a.change >= 0 ? '#0ecb81' : '#f6465d'};">${chg}</span>
+                        <span class="ctime">⏱ ${a.time}</span>
+                    </div>
+                `;
+            }
+            crossContainer.innerHTML = html;
+        }
+
+        // ======================================================================
+        // টপ সিগন্যাল + গ্রিড রেন্ডার
+        // ======================================================================
+        function renderTopAndGrid(allData) {
+            const entries = [];
+            for (const [sym, data] of Object.entries(allData)) {
+                const sc = computeScore(data);
+                const common = data['common'] || data['5m'] || data['1m'];
+                if (!common) continue;
+                entries.push({
+                    symbol: sym, price: common.price || 0, change: common.change || 0, vol24h: common.vol24h || 0,
+                    rsi: common.rsi || 50, stBull: common.stBull || false, stBear: common.stBear || false, volSpike: common.volSpike || false,
+                    signal: sc.signal, signalText: sc.signalText, score: sc.score, detail: sc.detail,
+                    lastUpdate: new Date().toLocaleTimeString('bn-BD'),
+                    cross5m: data['5m'] ? (data['5m'].crossUp ? 'bull' : data['5m'].crossDown ? 'bear' : null) : null,
+                    cross1m: data['1m'] ? (data['1m'].crossUp ? 'bull' : data['1m'].crossDown ? 'bear' : null) : null
+                });
+            }
+
+            entries.sort((a, b) => {
+                const order = { pump: 0, dump: 1, neutral: 2 };
+                if (order[a.signal] !== order[b.signal]) return order[a.signal] - order[b.signal];
+                return (b.score || 0) - (a.score || 0);
+            });
+
+            const top10 = entries.slice(0, 10);
+            let topHtml = '';
+            for (const e of top10) {
+                const cls = e.signal === 'pump' ? 'pump' : (e.signal === 'dump' ? 'dump' : '');
+                const sigCls = e.signal === 'pump' ? 'pump' : (e.signal === 'dump' ? 'dump' : 'neutral');
+                const cc = e.change >= 0 ? '#0ecb81' : '#f6465d';
+                const tools = [];
+                if (e.cross5m) tools.push(e.cross5m === 'bull' ? '🟢5m↑' : '🔴5m↓');
+                if (e.cross1m) tools.push(e.cross1m === 'bull' ? '🟢1m↑' : '🔴1m↓');
+                if (e.stBull) tools.push('Super↑');
+                if (e.stBear) tools.push('Super↓');
+                if (e.volSpike) tools.push('VOL🔥');
+                if (e.rsi < 30) tools.push('RSI↓');
+                if (e.rsi > 70) tools.push('RSI↑');
+
+                topHtml += `
+                    <div class="top-card ${cls}">
+                        <div class="sym">
+                            <span>${e.symbol}</span>
+                            <span class="sc">🔥 ${e.score}%</span>
+                        </div>
+                        <div class="price">$${formatPrice(e.price)}</div>
+                        <div style="color:${cc};font-size:0.7rem;">${e.change.toFixed(2)}% · $${(e.vol24h/1e6).toFixed(1)}M</div>
+                        <div class="sig-text ${sigCls}">${e.signalText}</div>
+                        <div style="font-size:0.6rem;color:#b7bdc6;">📌 ${e.detail || '—'}</div>
+                        <div class="mini-ind">
+                            ${tools.map(t => `<span>${t}</span>`).join('')}
+                            <span>RSI: <strong>${e.rsi.toFixed(1)}</strong></span>
+                        </div>
+                    </div>
+                `;
+            }
+            topContainer.innerHTML = topHtml || '<div class="loading">⚠️ কোনো সিগন্যাল নেই</div>';
+
+            const rest = entries.slice(10);
+            let gridHtml = '';
+            for (const e of rest) {
+                const cls = e.signal === 'pump' ? 'pump' : (e.signal === 'dump' ? 'dump' : '');
+                const cc = e.change >= 0 ? '#0ecb81' : '#f6465d';
+                const sigCls = e.signal === 'pump' ? 'pump' : (e.signal === 'dump' ? 'dump' : '');
+                const tools = [];
+                if (e.cross5m) tools.push(e.cross5m === 'bull' ? '🟢5m↑' : '🔴5m↓');
+                if (e.cross1m) tools.push(e.cross1m === 'bull' ? '🟢1m↑' : '🔴1m↓');
+                if (e.stBull) tools.push('Super↑');
+                if (e.stBear) tools.push('Super↓');
+                if (e.volSpike) tools.push('VOL🔥');
+
+                gridHtml += `
+                    <div class="card">
+                        <div class="sym">
+                            <span>${e.symbol}</span>
+                            <span class="badge">${e.signal === 'pump' ? '🚀' : e.signal === 'dump' ? '🔻' : '⚪'}</span>
+                        </div>
+                        <div class="price">$${formatPrice(e.price)}</div>
+                        <div class="change" style="color:${cc};">${e.change.toFixed(2)}% · $${(e.vol24h/1e6).toFixed(1)}M</div>
+                        <div class="sig-tag ${sigCls}">📡 ${e.signalText} (${e.score}%)</div>
+                        <div style="font-size:0.5rem;color:#b7bdc6;">📌 ${e.detail || '—'}</div>
+                        <div class="indics">
+                            ${tools.map(t => `<span>${t}</span>`).join('')}
+                            <span>RSI: <strong>${e.rsi.toFixed(1)}</strong></span>
+                        </div>
+                        <div style="font-size:0.45rem;color:#5e6673;">⏱ ${e.lastUpdate}</div>
+                    </div>
+                `;
+            }
+            container.innerHTML = gridHtml || '<div class="loading">⚠️ কোনো ডেটা নেই</div>';
+
+            return entries;
+        }
+
+        // ======================================================================
+        // মূল স্ক্যান ইঞ্জিন
+        // ======================================================================
+        async function scanAll() {
+            if (isScanning) return;
+            isScanning = true;
+            scanStatusEl.textContent = 'স্ক্যান...';
+
+            const syms = [...watchlist];
+            const allResults = {};
+
+            for (let i = 0; i < syms.length; i += BATCH_SIZE) {
+                const batch = syms.slice(i, i + BATCH_SIZE);
+                const batchPromises = batch.map(async (sym) => {
+                    const result = await analyzeAll(sym);
+                    return { sym, result };
+                });
+                const batchResults = await Promise.all(batchPromises);
+
+                for (const { sym, result } of batchResults) {
+                    if (result && Object.keys(result).length > 0) {
+                        allResults[sym] = result;
+                        trackCrosses(sym, result); // Alerts triggered inside trackCrosses
+                    }
+                }
+
+                scanStatusEl.textContent = `${Math.min(i + BATCH_SIZE, syms.length)}/${syms.length}`;
+                if (i + BATCH_SIZE < syms.length) {
+                    await new Promise(r => setTimeout(r, BATCH_DELAY));
+                }
+            }
+
+            coinData = allResults;
+            lastUpdateTimeEl.textContent = new Date().toLocaleTimeString('bn-BD');
+            totalCoinsEl.textContent = Object.keys(coinData).length;
+
+            renderOverextended(coinData);
+            renderCrosses();
+            const sorted = renderTopAndGrid(coinData);
+
+            const best = sorted.find(e => e.signal !== 'neutral');
+            if (best) {
+                signalTextEl.textContent = `${best.symbol} - ${best.signalText} (${best.score}%) [${best.detail}]`;
+                alertBar.className = `alert-bar ${best.signal === 'pump' ? 'pump' : 'dump'}`;
+            } else {
+                signalTextEl.textContent = '⏸ কোন সক্রিয় সিগন্যাল নেই';
+                alertBar.className = 'alert-bar';
+            }
+
+            scanStatusEl.textContent = `✅ ${Object.keys(coinData).length}টি`;
+            isScanning = false;
+        }
+
+        // ======================================================================
+        // টপ ৫০ লোড
+        // ======================================================================
+        async function loadTopCoins() {
+            try {
+                scanStatusEl.textContent = 'টপ কয়েন লোড...';
+                const res = await fetch(`${FUTURES_BASE}/fapi/v1/exchangeInfo`);
+                const data = await res.json();
+                let syms = data.symbols
+                    .filter(s => s.contractType === 'PERPETUAL' && s.quoteAsset === 'USDT' && s.status === 'TRADING')
+                    .map(s => s.symbol);
+                const tickersRes = await fetch(`${FUTURES_BASE}/fapi/v1/ticker/24hr`);
+                const tickers = await tickersRes.json();
+                const volMap = {};
+                tickers.forEach(t => { volMap[t.symbol] = parseFloat(t.quoteVolume) || 0; });
+                syms.sort((a, b) => (volMap[b] || 0) - (volMap[a] || 0));
+                watchlist = syms.slice(0, 50);
+                totalCoinsEl.textContent = watchlist.length;
+                scanStatusEl.textContent = `${watchlist.length}টি লোড`;
+                await scanAll();
+            } catch (e) {
+                scanStatusEl.textContent = '❌ ব্যর্থ';
+                watchlist = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'DOGEUSDT', 'ADAUSDT'];
+                totalCoinsEl.textContent = watchlist.length;
+                await scanAll();
+            }
+        }
+
+        // ======================================================================
+        // কন্ট্রোল হ্যান্ডলার্স
+        // ======================================================================
+        function addCoin() {
+            let val = coinInput.value.trim().toUpperCase();
+            if (!val) return;
+            if (!val.endsWith('USDT')) val += 'USDT';
+            if (!watchlist.includes(val)) {
+                watchlist.push(val);
+                coinInput.value = '';
+                totalCoinsEl.textContent = watchlist.length;
+                scanAll();
+            } else alert('ইতিমধ্যে আছে!');
+        }
+
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊 অন' : '🔇 অফ';
+            soundToggle.className = soundEnabled ? '' : 'snd-off';
+            if (!soundEnabled && speechSynth.speaking) speechSynth.cancel();
+        });
+
+        testVoiceBtn.addEventListener('click', () => {
+            speakAlert('BTCUSDT', 'cross_bull', '৫মি, +২.৫%');
+            setTimeout(() => speakAlert('ETHUSDT', 'cross_bear', '১মি, -৩.২%'), 2500);
+        });
+
+        addBtn.addEventListener('click', addCoin);
+        scanBtn.addEventListener('click', scanAll);
+        loadTopBtn.addEventListener('click', loadTopCoins);
+        coinInput.addEventListener('keydown', e => { if (e.key === 'Enter') addCoin(); });
+
+        (async function init() {
+            if (Notification.permission === 'default') Notification.requestPermission();
+            setTimeout(() => speechSynth.getVoices(), 500);
+            await loadTopCoins();
+            setInterval(scanAll, UPDATE_INTERVAL);
+        })();
+    </script>
+</body>
+</html>
